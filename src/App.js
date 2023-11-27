@@ -5,6 +5,7 @@ import Products from "./components/Shop/Products";
 import Notification from "./components/UI/Notification";
 import { useSelector, useDispatch } from "react-redux";
 import { uiActions } from "./store/ui-slice";
+import { sendCartData, fetchCartData } from "./store/cart-actions";
 
 let isInitial = true;
 
@@ -16,8 +17,10 @@ function App() {
   const cart = useSelector((state) => state.cart);
   const notification = useSelector((state) => state.ui.notification);
 
+  /*
   useEffect(() => {
     const sendCartData = async () => {
+      
       dispatch(
         uiActions.showNotification({
           status: "pending",
@@ -51,6 +54,7 @@ function App() {
     }
 
     sendCartData().catch((error) => {
+      
       dispatch(
         uiActions.showNotification({
           status: "error",
@@ -59,6 +63,22 @@ function App() {
         })
       );
     });
+  }, [cart, dispatch]);*/
+
+  //Only when runs for the first time
+  useEffect(() => {
+    dispatch(fetchCartData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isInitial) {
+      isInitial = false;
+      return;
+    }
+    //To avoid showing the notification "Fetching cart success", we add one more verification.
+    if (cart.changed) {
+      dispatch(sendCartData(cart));
+    }
   }, [cart, dispatch]);
 
   return (
